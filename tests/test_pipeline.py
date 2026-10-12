@@ -2,6 +2,9 @@ from app.pipeline.ingestion import calculate_tyre_degradation
 
 def test_calculate_tyre_degradation_valid():
     mock_stint = {
+        "year": 2026,
+        "grand_prix": "Bahrain",
+        "session_type": "R",
         "driver": "VER",
         "stint": 1,
         "compound": "MEDIUM",
@@ -17,6 +20,9 @@ def test_calculate_tyre_degradation_valid():
 
 def test_calculate_tyre_degradation_too_few_laps():
     mock_stint = {
+            "year": 2026,
+            "grand_prix": "Bahrain",
+            "session_type": "R",
             "driver": "VER",
             "stint": 1,
             "compound": "MEDIUM",

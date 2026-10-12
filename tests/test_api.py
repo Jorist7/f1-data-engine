@@ -53,9 +53,22 @@ def test_get_lap_summaries_with_data(client):
 
     assert response.status_code == 200
     data = response.json()
+
     assert len(data["summaries"]) == 1
     assert data["summaries"][0]["driver"] == "NOR"
     assert data["summaries"][0]["grand_prix"] == "Monaco"
+
+def test_get_tyre_degradation(client):
+    response = client.get("/degradation/2024/Bahrain/R/VER/1")
+
+    assert response.status_code == 200
+    data = response.json()
+
+    assert data["driver"] == "VER"
+    assert data["stint"] == 1
+    assert "degradation_per_lap" in data
+    assert "base_pace" in data
+    assert "laps_analyzed" in data
 
 
 

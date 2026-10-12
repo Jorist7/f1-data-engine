@@ -3,7 +3,7 @@ from app.core.database import SessionLocal, init_db
 from app.models.lap_summary import LapSummary
 from app.models.tyre_degradation import TyreDegradation
 from sqlalchemy.orm import Session
-from app.models.pydantic_models import SessionRequest
+from app.models.pydantic_models import SessionRequest, TyreDegradationResponse
 from app.pipeline.ingestion import save_session_summary_to_db, save_degradation_to_db, get_stint_telemetry, calculate_tyre_degradation
 
 init_db()
@@ -42,7 +42,7 @@ def fetch_session(session_request: SessionRequest, db: Session = Depends(get_db)
     
     return {"status": "success", "message": "Data ingested successfully"}
 
-@app.get("/degradation/{year}/{grand_prix}/{session_type}/{driver}/{stint}")
+@app.get("/degradation/{year}/{grand_prix}/{session_type}/{driver}/{stint}", response_model=TyreDegradationResponse)
 def get_degradation_data(year: int, grand_prix: str, session_type: str, driver: str, stint: int, db: Session = Depends(get_db)):
     degradation_data = db.query(TyreDegradation).filter(
         TyreDegradation.year == year,
@@ -53,7 +53,7 @@ def get_degradation_data(year: int, grand_prix: str, session_type: str, driver: 
     ).first()
 
     if degradation_data:
-        return {"degradation_data": degradation_data}
+        return degradation_data
 
     stint_telemetry = get_stint_telemetry(year, grand_prix, session_type, driver, stint)
     tyre_degradation = calculate_tyre_degradation(stint_telemetry)
@@ -66,7 +66,7 @@ def get_degradation_data(year: int, grand_prix: str, session_type: str, driver: 
     if not saved_data:
         raise HTTPException(status_code=500, detail="Could not save degradation data to database!")
 
-    return {"degradation_data": saved_data}
+    return saved_data
 
 
 
